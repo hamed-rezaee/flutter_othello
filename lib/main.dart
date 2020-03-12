@@ -54,19 +54,28 @@ class _MyHomePageState extends State<MyHomePage> {
             padding: const EdgeInsets.only(top: 24.0),
             height: 90.0,
             color: Colors.redAccent,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Player',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Current Player ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12.0,
+                    ),
                   ),
-                ),
-                _buildBlockUnit(_isFirstPersonTurn),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: _buildBlockUnit(
+                      _isFirstPersonTurn,
+                      size: 16.0,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(height: 16.0),
@@ -138,11 +147,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  static Widget _buildBlockUnit(bool isFirstPersonTurn) {
+  static Widget _buildBlockUnit(bool isFirstPersonTurn, {double size = 32.0}) {
     return Container(
       padding: const EdgeInsets.all(8.0),
-      width: 32.0,
-      height: 32.0,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50.0),
         color: isFirstPersonTurn ? Colors.black : Colors.white,
