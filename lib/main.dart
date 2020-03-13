@@ -183,55 +183,59 @@ class _MyHomePageState extends State<MyHomePage> {
       bool updateState = false;
 
       if (_validateTop(row, column)) {
-        _changeTopColor(row, column);
+        _changeTopColor(row, column, false);
 
         updateState = true;
       }
 
       if (_validateBottom(row, column)) {
-        _changeButtomColor(row, column);
+        _changeButtomColor(row, column, false);
 
         updateState = true;
       }
 
       if (_validateLeft(row, column)) {
-        _changeLeftColor(row, column);
+        _changeLeftColor(row, column, false);
 
         updateState = true;
       }
 
       if (_validateRight(row, column)) {
-        _changeRightColor(row, column);
+        _changeRightColor(row, column, false);
 
         updateState = true;
       }
 
       if (_validateTopLeft(row, column)) {
-        _changeTopLeftColor(row, column);
+        _changeTopLeftColor(row, column, false);
 
         updateState = true;
       }
 
       if (_validateTopRight(row, column)) {
-        _changeTopRightColor(row, column);
+        _changeTopRightColor(row, column, false);
 
         updateState = true;
       }
 
       if (_validateBottomLeft(row, column)) {
-        _changeBottomLeftColor(row, column);
+        _changeBottomLeftColor(row, column, false);
 
         updateState = true;
       }
 
       if (_validateBottomRight(row, column)) {
-        _changeBottomRightColor(row, column);
+        _changeBottomRightColor(row, column, false);
 
         updateState = true;
       }
 
       if (updateState) {
         setState(() => _isFirstPersonTurn = !_isFirstPersonTurn);
+
+        if (!_isFirstPersonTurn) {
+          _selectBestCuttentChoise();
+        }
       }
     }
   }
@@ -502,76 +506,156 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
-  void _changeTopColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeTopColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[--row][column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
-  void _changeButtomColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeButtomColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[++row][column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
-  void _changeLeftColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeLeftColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[row][--column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
-  void _changeRightColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeRightColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[row][++column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
-  void _changeTopLeftColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeTopLeftColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[--row][--column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
-  void _changeTopRightColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeTopRightColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[--row][++column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
-  void _changeBottomLeftColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeBottomLeftColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[++row][--column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
-  void _changeBottomRightColor(int row, int column) {
-    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+  int _changeBottomRightColor(int row, int column, bool getCountOnly) {
+    int count = 1;
+
+    if (!getCountOnly) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
 
     while ((_board[++row][++column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      if (!getCountOnly) {
+        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      }
+
+      count++;
     }
+
+    return count;
   }
 
   int _getScore(bool isFirstPlayer) {
@@ -593,7 +677,7 @@ class _MyHomePageState extends State<MyHomePage> {
       8,
       (int row) => List.generate(
         8,
-        (column) => row == 3 && column == 3
+        (int column) => row == 3 && column == 3
             ? _buildBlockUnit(false)
             : row == 3 && column == 4
                 ? _buildBlockUnit(true)
@@ -606,5 +690,77 @@ class _MyHomePageState extends State<MyHomePage> {
     _isFirstPersonTurn = true;
 
     setState(() {});
+  }
+
+  List<List<int>> _getChoises() {
+    List<List<int>> scores = List.generate(
+      8,
+      (int row) => List.generate(
+        8,
+        (int column) => 0,
+      ),
+    );
+
+    for (int row = 0; row < 8; row++) {
+      for (int column = 0; column < 8; column++) {
+        if (_isEmpty(row, column)) {
+          int score = 0;
+
+          if (_validateTop(row, column)) {
+            score = _changeTopColor(row, column, true);
+          }
+
+          if (_validateBottom(row, column)) {
+            score = _changeButtomColor(row, column, true);
+          }
+
+          if (_validateLeft(row, column)) {
+            score = _changeLeftColor(row, column, true);
+          }
+
+          if (_validateRight(row, column)) {
+            score = _changeRightColor(row, column, true);
+          }
+
+          if (_validateTopLeft(row, column)) {
+            score = _changeTopLeftColor(row, column, true);
+          }
+
+          if (_validateTopRight(row, column)) {
+            score = _changeTopRightColor(row, column, true);
+          }
+
+          if (_validateBottomLeft(row, column)) {
+            score = _changeBottomLeftColor(row, column, true);
+          }
+
+          if (_validateBottomRight(row, column)) {
+            score = _changeBottomRightColor(row, column, true);
+          }
+
+          scores[row][column] = score;
+        }
+      }
+    }
+
+    return scores;
+  }
+
+  void _selectBestCuttentChoise() {
+    List<List<int>> scores = _getChoises();
+
+    int bestRow = 0;
+    int bestColumn = 0;
+
+    for (int row = 0; row < 8; row++) {
+      for (int column = 0; column < 8; column++) {
+        if (scores[row][column] > scores[bestRow][bestColumn]) {
+          bestRow = row;
+          bestColumn = column;
+        }
+      }
+    }
+
+    _calculateMoves(bestRow, bestColumn);
   }
 }
