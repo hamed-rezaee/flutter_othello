@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -108,17 +108,23 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ..._generatePlayground(),
-          SizedBox(height: 32.0),
-          OutlineButton(
-            child: Text('RESTART GAME'),
-            onPressed: _resetBoard,
-          )
-        ],
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: const EdgeInsets.all(64.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ..._generatePlayground(),
+              SizedBox(height: 64.0),
+              OutlineButton(
+                child: Text('RESTART GAME'),
+                onPressed: _resetBoard,
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
