@@ -783,7 +783,28 @@ class _MyHomePageState extends State<MyHomePage> {
           positions[math.Random().nextInt(math.min(positions.length, 3))];
 
       _calculateMoves(selectedPosition.row, selectedPosition.column);
+    } else {
+      _showResultDialog();
     }
+  }
+
+  Future<void> _showResultDialog() async {
+    AlertDialog alert = AlertDialog(
+      title: Text('${_getScore(true) > _getScore(false) ? 'YOU' : 'AI'} WIN!'),
+      actions: [
+        FlatButton(
+          child: Text("OK"),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }
 
