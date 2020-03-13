@@ -31,55 +31,93 @@ class _MyHomePageState extends State<MyHomePage> {
   static bool _isFirstPersonTurn = true;
   static Color _backgroundColor = Colors.green;
 
-  final List<List<Container>> _board = List.generate(
-    8,
-    (int row) => List.generate(
-      8,
-      (column) => row == 3 && column == 3
-          ? _buildBlockUnit(false)
-          : row == 3 && column == 4
-              ? _buildBlockUnit(true)
-              : row == 4 && column == 3
-                  ? _buildBlockUnit(true)
-                  : row == 4 && column == 4 ? _buildBlockUnit(false) : null,
-    ),
-  );
+  List<List<Container>> _board;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _resetBoard();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.only(top: 24.0),
-            height: 90.0,
-            color: Colors.redAccent,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Current Player ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12.0,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: _buildBlockUnit(
-                      _isFirstPersonTurn,
+      appBar: AppBar(
+        elevation: 0.0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    _buildBlockUnit(
+                      true,
                       size: 16.0,
                     ),
-                  ),
-                ],
-              ),
+                    SizedBox(width: 8.0),
+                    Text(
+                      '${_getScore(true)}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.0),
+                Row(
+                  children: <Widget>[
+                    _buildBlockUnit(
+                      false,
+                      size: 16.0,
+                    ),
+                    SizedBox(width: 8.0),
+                    Text(
+                      '${_getScore(false)}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-          SizedBox(height: 16.0),
-          ..._generatePlayground()
+            Column(
+              children: <Widget>[
+                Text(
+                  'Current Player ',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.0,
+                  ),
+                ),
+                SizedBox(height: 4.0),
+                _buildBlockUnit(
+                  _isFirstPersonTurn,
+                  size: 16.0,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ..._generatePlayground(),
+          SizedBox(height: 32.0),
+          OutlineButton(
+            child: Text('RESTART GAME'),
+            onPressed: _resetBoard,
+          )
         ],
       ),
     );
@@ -336,5 +374,39 @@ class _MyHomePageState extends State<MyHomePage> {
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
       _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
     }
+  }
+
+  int _getScore(bool isFirstPlayer) {
+    int score = 0;
+
+    for (int row = 0; row < 8; row++) {
+      for (int column = 0; column < 8; column++) {
+        if (_board[row][column] != null &&
+            (_board[row][column].decoration as BoxDecoration).color ==
+                (isFirstPlayer ? Colors.black : Colors.white)) score++;
+      }
+    }
+
+    return score;
+  }
+
+  void _resetBoard() {
+    _board = List.generate(
+      8,
+      (int row) => List.generate(
+        8,
+        (column) => row == 3 && column == 3
+            ? _buildBlockUnit(false)
+            : row == 3 && column == 4
+                ? _buildBlockUnit(true)
+                : row == 4 && column == 3
+                    ? _buildBlockUnit(true)
+                    : row == 4 && column == 4 ? _buildBlockUnit(false) : null,
+      ),
+    );
+
+    _isFirstPersonTurn = true;
+
+    setState(() {});
   }
 }
