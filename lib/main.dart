@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
-const int BOARD_SIZE = 10;
+const int BOARD_SIZE = 8;
 
 const Color PLAYER_COLOR = Colors.black;
 const Color AI_COLOR = Colors.white;
@@ -88,10 +88,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: _blocSize,
                   decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(2.0),
+                    borderRadius: BorderRadius.circular(6.0),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(3.0),
+                    padding: const EdgeInsets.all(4.0),
                     child: _board[row][column],
                   ),
                 ),
