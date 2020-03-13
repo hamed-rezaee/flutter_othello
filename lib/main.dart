@@ -200,6 +200,30 @@ class _MyHomePageState extends State<MyHomePage> {
         updateState = true;
       }
 
+      if (_validateTopLeft(row, column)) {
+        _changeTopLeftColor(row, column);
+
+        updateState = true;
+      }
+
+      if (_validateTopRight(row, column)) {
+        _changeTopRightColor(row, column);
+
+        updateState = true;
+      }
+
+      if (_validateBottomLeft(row, column)) {
+        _changeBottomLeftColor(row, column);
+
+        updateState = true;
+      }
+
+      if (_validateBottomRight(row, column)) {
+        _changeBottomRightColor(row, column);
+
+        updateState = true;
+      }
+
       if (updateState) {
         setState(() => _isFirstPersonTurn = !_isFirstPersonTurn);
       }
@@ -340,6 +364,138 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
+  bool _validateTopLeft(int row, int column) {
+    if (row - 2 < 0 || column - 2 < 0) {
+      return false;
+    }
+
+    if (_board[row - 1][column - 1] == null) {
+      return false;
+    }
+
+    if ((_board[row - 1][column - 1]?.decoration as BoxDecoration).color ==
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      return false;
+    }
+
+    while (row - 2 >= 0 && column - 2 >= 0) {
+      Container child = _board[row - 2][column - 2];
+
+      if (child == null) {
+        return false;
+      }
+
+      if ((child.decoration as BoxDecoration).color ==
+          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        return true;
+      }
+
+      row--;
+      column--;
+    }
+
+    return false;
+  }
+
+  bool _validateTopRight(int row, int column) {
+    if (row - 2 < 0 || column + 2 > 7) {
+      return false;
+    }
+
+    if (_board[row - 1][column + 1] == null) {
+      return false;
+    }
+
+    if ((_board[row - 1][column + 1]?.decoration as BoxDecoration).color ==
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      return false;
+    }
+
+    while (row - 2 >= 0 && column + 2 <= 7) {
+      Container child = _board[row - 2][column + 2];
+
+      if (child == null) {
+        return false;
+      }
+
+      if ((child.decoration as BoxDecoration).color ==
+          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        return true;
+      }
+
+      row--;
+      column++;
+    }
+
+    return false;
+  }
+
+  bool _validateBottomLeft(int row, int column) {
+    if (row + 2 > 7 || column - 2 < 0) {
+      return false;
+    }
+
+    if (_board[row + 1][column - 1] == null) {
+      return false;
+    }
+
+    if ((_board[row + 1][column - 1]?.decoration as BoxDecoration).color ==
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      return false;
+    }
+
+    while (row + 2 <= 7 && column - 2 >= 0) {
+      Container child = _board[row + 2][column - 2];
+
+      if (child == null) {
+        return false;
+      }
+
+      if ((child.decoration as BoxDecoration).color ==
+          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        return true;
+      }
+
+      row++;
+      column--;
+    }
+
+    return false;
+  }
+
+  bool _validateBottomRight(int row, int column) {
+    if (row + 2 > 7 || column + 2 > 7) {
+      return false;
+    }
+
+    if (_board[row + 1][column + 1] == null) {
+      return false;
+    }
+
+    if ((_board[row + 1][column + 1]?.decoration as BoxDecoration).color ==
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      return false;
+    }
+
+    while (row + 2 <= 7 && column + 2 <= 7) {
+      Container child = _board[row + 2][column + 2];
+
+      if (child == null) {
+        return false;
+      }
+
+      if ((child.decoration as BoxDecoration).color ==
+          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        return true;
+      }
+
+      row++;
+      column++;
+    }
+
+    return false;
+  }
+
   void _changeTopColor(int row, int column) {
     _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
 
@@ -371,6 +527,42 @@ class _MyHomePageState extends State<MyHomePage> {
     _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
 
     while ((_board[row][++column].decoration as BoxDecoration).color !=
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
+  }
+
+  void _changeTopLeftColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
+    while ((_board[--row][--column].decoration as BoxDecoration).color !=
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
+  }
+
+  void _changeTopRightColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
+    while ((_board[--row][++column].decoration as BoxDecoration).color !=
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
+  }
+
+  void _changeBottomLeftColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
+    while ((_board[++row][--column].decoration as BoxDecoration).color !=
+        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+    }
+  }
+
+  void _changeBottomRightColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
+    while ((_board[++row][++column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
       _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
     }
