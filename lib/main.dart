@@ -248,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if (!_isFirstPersonTurn) {
           Future.delayed(
             Duration(milliseconds: 500),
-            () => _selectBestCuttentChoise(),
+            () => _selectGoodChoice(),
           );
         }
       }
@@ -707,7 +707,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  List<List<int>> _getChoises() {
+  List<List<int>> _getChoices() {
     List<List<int>> scores = List.generate(
       8,
       (int row) => List.generate(
@@ -761,8 +761,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return scores;
   }
 
-  void _selectBestCuttentChoise() {
-    List<List<int>> scores = _getChoises();
+  void _selectGoodChoice() {
+    List<List<int>> scores = _getChoices();
     List<Position> positions = [];
     Position selectedPosition;
 
