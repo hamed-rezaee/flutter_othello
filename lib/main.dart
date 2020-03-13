@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -762,19 +763,34 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _selectBestCuttentChoise() {
     List<List<int>> scores = _getChoises();
-
-    int bestRow = 0;
-    int bestColumn = 0;
+    List<Position> positions = [];
+    Position selectedPosition;
 
     for (int row = 0; row < 8; row++) {
       for (int column = 0; column < 8; column++) {
-        if (scores[row][column] > scores[bestRow][bestColumn]) {
-          bestRow = row;
-          bestColumn = column;
+        if (scores[row][column] > 0) {
+          positions.add(Position(row, column, scores[row][column]));
         }
       }
     }
 
-    _calculateMoves(bestRow, bestColumn);
+    positions.sort(
+      (Position first, Position second) => second.score.compareTo(first.score),
+    );
+
+    if (positions.isNotEmpty) {
+      selectedPosition =
+          positions[math.Random().nextInt(math.min(positions.length, 3))];
+
+      _calculateMoves(selectedPosition.row, selectedPosition.column);
+    }
   }
+}
+
+class Position {
+  final int row;
+  final int column;
+  final int score;
+
+  Position(this.row, this.column, this.score);
 }
