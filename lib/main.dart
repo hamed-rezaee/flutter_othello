@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: _board[row][column],
                   ),
                 ),
-                onTap: () => _calculateMoves(row, column),
+                onTap: () => _calculateChanges(row: row, column: column),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 2.0),
@@ -188,71 +188,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
-  }
-
-  void _calculateMoves(int row, int column) {
-    if (_isEmpty(row, column)) {
-      bool updateState = false;
-
-      if (_validateTop(row, column)) {
-        _changeTopColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (_validateBottom(row, column)) {
-        _changeButtomColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (_validateLeft(row, column)) {
-        _changeLeftColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (_validateRight(row, column)) {
-        _changeRightColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (_validateTopLeft(row, column)) {
-        _changeTopLeftColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (_validateTopRight(row, column)) {
-        _changeTopRightColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (_validateBottomLeft(row, column)) {
-        _changeBottomLeftColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (_validateBottomRight(row, column)) {
-        _changeBottomRightColor(row, column, false);
-
-        updateState = true;
-      }
-
-      if (updateState) {
-        setState(() => _isFirstPersonTurn = !_isFirstPersonTurn);
-
-        if (!_isFirstPersonTurn) {
-          Future.delayed(
-            Duration(milliseconds: 500),
-            () => _selectGoodChoice(),
-          );
-        }
-      }
-    }
   }
 
   static Widget _buildBlockUnit(bool isFirstPersonTurn, {double size = 32.0}) {
@@ -707,7 +642,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  List<List<int>> _getChoices() {
+  List<List<int>> _getPositionsInformation() {
     List<List<int>> scores = List.generate(
       8,
       (int row) => List.generate(
@@ -761,50 +696,114 @@ class _MyHomePageState extends State<MyHomePage> {
     return scores;
   }
 
-  void _selectGoodChoice() {
-    List<List<int>> scores = _getChoices();
-    List<Position> positions = [];
-    Position selectedPosition;
+  List<Position> _getAvailablePositions() {
+    List<List<int>> scores = _getPositionsInformation();
+    List<Position> availablePositions = [];
 
     for (int row = 0; row < 8; row++) {
       for (int column = 0; column < 8; column++) {
         if (scores[row][column] > 0) {
-          positions.add(Position(row, column, scores[row][column]));
+          availablePositions.add(Position(row, column, scores[row][column]));
         }
       }
     }
 
-    positions.sort(
-      (Position first, Position second) => second.score.compareTo(first.score),
-    );
+    return availablePositions;
+  }
 
-    if (positions.isNotEmpty) {
+  void _selectGoodPosition() {
+    List<Position> positions = _getAvailablePositions();
+
+    if (positions.isEmpty) {
+      _calculateChanges(hasNoAvailablePosition: true);
+    } else {
+      Position selectedPosition;
+
+      positions.sort(
+        (Position first, Position second) => second.score.compareTo(first.score),
+      );
+
       selectedPosition =
           positions[math.Random().nextInt(math.min(positions.length, 3))];
 
-      _calculateMoves(selectedPosition.row, selectedPosition.column);
-    } else {
-      _showResultDialog();
+      _calculateChanges(row: selectedPosition.row, column: selectedPosition.column);
     }
   }
 
-  Future<void> _showResultDialog() async {
-    AlertDialog alert = AlertDialog(
-      title: Text('${_getScore(true) > _getScore(false) ? 'YOU' : 'AI'} WIN!'),
-      actions: [
-        FlatButton(
-          child: Text("OK"),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ],
-    );
+  void _calculateChanges({
+    int row,
+    int column,
+    bool hasNoAvailablePosition = false,
+  }) {
+    if (hasNoAvailablePosition || _getAvailablePositions().isEmpty) {
+      Future.delayed(
+        Duration(milliseconds: 500),
+        () => setState(() => _isFirstPersonTurn = !_isFirstPersonTurn),
+      );
+    } else {
+      if (_isEmpty(row, column)) {
+        bool updateState = false;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
+        if (_validateTop(row, column)) {
+          _changeTopColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (_validateBottom(row, column)) {
+          _changeButtomColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (_validateLeft(row, column)) {
+          _changeLeftColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (_validateRight(row, column)) {
+          _changeRightColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (_validateTopLeft(row, column)) {
+          _changeTopLeftColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (_validateTopRight(row, column)) {
+          _changeTopRightColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (_validateBottomLeft(row, column)) {
+          _changeBottomLeftColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (_validateBottomRight(row, column)) {
+          _changeBottomRightColor(row, column, false);
+
+          updateState = true;
+        }
+
+        if (updateState) {
+          setState(() => _isFirstPersonTurn = !_isFirstPersonTurn);
+
+          if (!_isFirstPersonTurn) {
+            Future.delayed(
+              Duration(milliseconds: 500),
+              () => _selectGoodPosition(),
+            );
+          }
+        }
+      }
+    }
   }
 }
 
