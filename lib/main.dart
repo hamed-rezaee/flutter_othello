@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Column(
               children: <Widget>[
                 Text(
-                  'Current Player ',
+                  'CURRENT PLAYER',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -134,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children.add(
           Row(
             children: <Widget>[
-              InkWell(
+              GestureDetector(
                 child: Container(
                   width: size,
                   height: size,
