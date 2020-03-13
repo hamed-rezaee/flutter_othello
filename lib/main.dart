@@ -3,12 +3,19 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
+const int BOARD_SIZE = 10;
+
+const Color PLAYER_COLOR = Colors.black;
+const Color AI_COLOR = Colors.white;
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Reversi',
       theme: ThemeData(
+        primaryColor: Colors.blueGrey,
+        accentColor: Colors.green,
         primarySwatch: Colors.blueGrey,
       ),
       home: MyHomePage(title: 'Reversi'),
@@ -29,8 +36,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static bool _isFirstPersonTurn = true;
-  static Color _backgroundColor = Colors.green;
+  double _blocSize;
+  bool _isPlayerTurn = true;
 
   List<List<Container>> _board;
 
@@ -43,6 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _blocSize = (MediaQuery.of(context).size.width - BOARD_SIZE * 5) / BOARD_SIZE;
+
     return Scaffold(
       appBar: _buildAppBar(),
       body: Column(
@@ -64,23 +73,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> _generatePlayground() {
-    List<Widget> result = List<Widget>();
-    double size = 32.0;
+    List<Widget> playground = List<Widget>();
 
-    for (int row = 0; row < 8; row++) {
+    for (int row = 0; row < BOARD_SIZE; row++) {
       List<Widget> children = List<Widget>();
 
-      for (int column = 0; column < 8; column++) {
+      for (int column = 0; column < BOARD_SIZE; column++) {
         children.add(
           Row(
             children: <Widget>[
               GestureDetector(
                 child: Container(
-                  width: size,
-                  height: size,
+                  width: _blocSize,
+                  height: _blocSize,
                   decoration: BoxDecoration(
-                    color: _backgroundColor,
-                    borderRadius: BorderRadius.circular(4.0),
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(2.0),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(3.0),
@@ -97,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       }
 
-      result.add(
+      playground.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 2.0),
           child: Row(
@@ -109,29 +117,29 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    return result;
+    return playground;
   }
 
-  Widget _buildScore(bool isFirstPersonTurn) {
+  Widget _buildScore(bool isPlayerTurn) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(
           vertical: 18.0,
           horizontal: 32.0,
         ),
-        color: isFirstPersonTurn ? Colors.grey.shade400 : Colors.blueGrey,
+        color: isPlayerTurn ? Colors.grey.shade400 : Colors.blueGrey,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             _buildBlockUnit(
-              isFirstPersonTurn,
+              isPlayerTurn,
               size: 16.0,
             ),
             Text(
-              ' x ${_getScore(isFirstPersonTurn)}',
+              ' x ${_getScore(isPlayerTurn)}',
               style: TextStyle(
-                color: isFirstPersonTurn ? Colors.black : Colors.white,
+                color: isPlayerTurn ? PLAYER_COLOR : AI_COLOR,
                 fontWeight: FontWeight.bold,
                 fontSize: 14.0,
               ),
@@ -150,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           RaisedButton(
             elevation: 0.0,
-            color: Colors.green,
+            color: Theme.of(context).accentColor,
             child: Text(
               'RESTART GAME',
               style: TextStyle(
@@ -179,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 SizedBox(width: 8.0),
                 _buildBlockUnit(
-                  _isFirstPersonTurn,
+                  _isPlayerTurn,
                   size: 16.0,
                 ),
               ],
@@ -190,14 +198,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  static Widget _buildBlockUnit(bool isFirstPersonTurn, {double size = 32.0}) {
+  static Widget _buildBlockUnit(bool isPlayerTurn, {double size = 32.0}) {
     return Container(
       padding: const EdgeInsets.all(8.0),
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.0),
-        color: isFirstPersonTurn ? Colors.black : Colors.white,
+        borderRadius: BorderRadius.circular((BOARD_SIZE * 4).toDouble()),
+        color: isPlayerTurn ? PLAYER_COLOR : AI_COLOR,
       ),
     );
   }
@@ -214,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row - 1][column]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
@@ -226,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
     }
@@ -235,7 +243,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool _validateBottom(int row, int column) {
-    if (row + 2 > 7) {
+    if (row + 2 > BOARD_SIZE - 1) {
       return false;
     }
 
@@ -244,11 +252,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row + 1][column]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
-    for (int i = row + 2; i < 8; i++) {
+    for (int i = row + 2; i < BOARD_SIZE; i++) {
       Container child = _board[i][column];
 
       if (child == null) {
@@ -256,7 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
     }
@@ -274,7 +282,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row][column - 1]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
@@ -286,7 +294,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
     }
@@ -295,7 +303,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool _validateRight(int row, int column) {
-    if (column + 2 > 7) {
+    if (column + 2 > BOARD_SIZE - 1) {
       return false;
     }
 
@@ -304,11 +312,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row][column + 1]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
-    for (int i = column + 2; i < 8; i++) {
+    for (int i = column + 2; i < BOARD_SIZE; i++) {
       Container child = _board[row][i];
 
       if (child == null) {
@@ -316,7 +324,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
     }
@@ -334,7 +342,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row - 1][column - 1]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
@@ -346,7 +354,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
 
@@ -358,7 +366,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool _validateTopRight(int row, int column) {
-    if (row - 2 < 0 || column + 2 > 7) {
+    if (row - 2 < 0 || column + 2 > BOARD_SIZE - 1) {
       return false;
     }
 
@@ -367,11 +375,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row - 1][column + 1]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
-    while (row - 2 >= 0 && column + 2 <= 7) {
+    while (row - 2 >= 0 && column + 2 <= BOARD_SIZE - 1) {
       Container child = _board[row - 2][column + 2];
 
       if (child == null) {
@@ -379,7 +387,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
 
@@ -391,7 +399,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool _validateBottomLeft(int row, int column) {
-    if (row + 2 > 7 || column - 2 < 0) {
+    if (row + 2 > BOARD_SIZE - 1 || column - 2 < 0) {
       return false;
     }
 
@@ -400,11 +408,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row + 1][column - 1]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
-    while (row + 2 <= 7 && column - 2 >= 0) {
+    while (row + 2 <= BOARD_SIZE - 1 && column - 2 >= 0) {
       Container child = _board[row + 2][column - 2];
 
       if (child == null) {
@@ -412,7 +420,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
 
@@ -424,7 +432,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool _validateBottomRight(int row, int column) {
-    if (row + 2 > 7 || column + 2 > 7) {
+    if (row + 2 > BOARD_SIZE - 1 || column + 2 > BOARD_SIZE - 1) {
       return false;
     }
 
@@ -433,11 +441,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if ((_board[row + 1][column + 1]?.decoration as BoxDecoration).color ==
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       return false;
     }
 
-    while (row + 2 <= 7 && column + 2 <= 7) {
+    while (row + 2 <= BOARD_SIZE - 1 && column + 2 <= BOARD_SIZE - 1) {
       Container child = _board[row + 2][column + 2];
 
       if (child == null) {
@@ -445,7 +453,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       if ((child.decoration as BoxDecoration).color ==
-          (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+          (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
         return true;
       }
 
@@ -460,13 +468,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[--row][column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -479,13 +487,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[++row][column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -498,13 +506,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[row][--column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -517,13 +525,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[row][++column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -536,13 +544,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[--row][--column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -555,13 +563,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[--row][++column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -574,13 +582,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[++row][--column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -593,13 +601,13 @@ class _MyHomePageState extends State<MyHomePage> {
     int count = 1;
 
     if (!getCountOnly) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+      _board[row][column] = _buildBlockUnit(_isPlayerTurn);
     }
 
     while ((_board[++row][++column].decoration as BoxDecoration).color !=
-        (_isFirstPersonTurn ? Colors.black : Colors.white)) {
+        (_isPlayerTurn ? PLAYER_COLOR : AI_COLOR)) {
       if (!getCountOnly) {
-        _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+        _board[row][column] = _buildBlockUnit(_isPlayerTurn);
       }
 
       count++;
@@ -611,11 +619,11 @@ class _MyHomePageState extends State<MyHomePage> {
   int _getScore(bool isFirstPlayer) {
     int score = 0;
 
-    for (int row = 0; row < 8; row++) {
-      for (int column = 0; column < 8; column++) {
+    for (int row = 0; row < BOARD_SIZE; row++) {
+      for (int column = 0; column < BOARD_SIZE; column++) {
         if (_board[row][column] != null &&
             (_board[row][column].decoration as BoxDecoration).color ==
-                (isFirstPlayer ? Colors.black : Colors.white)) score++;
+                (isFirstPlayer ? PLAYER_COLOR : AI_COLOR)) score++;
       }
     }
 
@@ -624,35 +632,37 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _resetBoard() {
     _board = List.generate(
-      8,
+      BOARD_SIZE,
       (int row) => List.generate(
-        8,
-        (int column) => row == 3 && column == 3
+        BOARD_SIZE,
+        (int column) => row == BOARD_SIZE / 2 - 1 && column == BOARD_SIZE / 2 - 1
             ? _buildBlockUnit(false)
-            : row == 3 && column == 4
+            : row == BOARD_SIZE / 2 - 1 && column == BOARD_SIZE / 2
                 ? _buildBlockUnit(true)
-                : row == 4 && column == 3
+                : row == BOARD_SIZE / 2 && column == BOARD_SIZE / 2 - 1
                     ? _buildBlockUnit(true)
-                    : row == 4 && column == 4 ? _buildBlockUnit(false) : null,
+                    : row == BOARD_SIZE / 2 && column == BOARD_SIZE / 2
+                        ? _buildBlockUnit(false)
+                        : null,
       ),
     );
 
-    _isFirstPersonTurn = true;
+    _isPlayerTurn = true;
 
     setState(() {});
   }
 
   List<List<int>> _getPositionsInformation() {
     List<List<int>> scores = List.generate(
-      8,
+      BOARD_SIZE,
       (int row) => List.generate(
-        8,
+        BOARD_SIZE,
         (int column) => 0,
       ),
     );
 
-    for (int row = 0; row < 8; row++) {
-      for (int column = 0; column < 8; column++) {
+    for (int row = 0; row < BOARD_SIZE; row++) {
+      for (int column = 0; column < BOARD_SIZE; column++) {
         if (_isEmpty(row, column)) {
           int score = 0;
 
@@ -700,8 +710,8 @@ class _MyHomePageState extends State<MyHomePage> {
     List<List<int>> scores = _getPositionsInformation();
     List<Position> availablePositions = [];
 
-    for (int row = 0; row < 8; row++) {
-      for (int column = 0; column < 8; column++) {
+    for (int row = 0; row < BOARD_SIZE; row++) {
+      for (int column = 0; column < BOARD_SIZE; column++) {
         if (scores[row][column] > 0) {
           availablePositions.add(Position(row, column, scores[row][column]));
         }
@@ -738,7 +748,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (hasNoAvailablePosition || _getAvailablePositions().isEmpty) {
       Future.delayed(
         Duration(milliseconds: 500),
-        () => setState(() => _isFirstPersonTurn = !_isFirstPersonTurn),
+        () => setState(() => _isPlayerTurn = !_isPlayerTurn),
       );
     } else {
       if (_isEmpty(row, column)) {
@@ -793,9 +803,9 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         if (updateState) {
-          setState(() => _isFirstPersonTurn = !_isFirstPersonTurn);
+          setState(() => _isPlayerTurn = !_isPlayerTurn);
 
-          if (!_isFirstPersonTurn) {
+          if (!_isPlayerTurn) {
             Future.delayed(
               Duration(milliseconds: 500),
               () => _selectGoodPosition(),
