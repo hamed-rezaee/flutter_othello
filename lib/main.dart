@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: _board[row][column],
                   ),
                 ),
-                onTap: () => _changeChild(row, column),
+                onTap: () => _calculateMoves(row, column),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 2.0),
@@ -134,16 +134,37 @@ class _MyHomePageState extends State<MyHomePage> {
     return result;
   }
 
-  void _changeChild(int row, int column) {
-    if (_isEmpty(row, column) &&
-        (_isValidTop(row, column) ||
-            _isValidBottom(row, column) ||
-            _isValidLeft(row, column) ||
-            _isValidRight(row, column))) {
-      _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
-      _isFirstPersonTurn = !_isFirstPersonTurn;
+  void _calculateMoves(int row, int column) {
+    if (_isEmpty(row, column)) {
+      bool updateState = false;
 
-      setState(() {});
+      if (_validateTop(row, column)) {
+        _changeTopColor(row, column);
+
+        updateState = true;
+      }
+
+      if (_validateBottom(row, column)) {
+        _changeButtomColor(row, column);
+
+        updateState = true;
+      }
+
+      if (_validateLeft(row, column)) {
+        _changeLeftColor(row, column);
+
+        updateState = true;
+      }
+
+      if (_validateRight(row, column)) {
+        _changeRightColor(row, column);
+
+        updateState = true;
+      }
+
+      if (updateState) {
+        setState(() => _isFirstPersonTurn = !_isFirstPersonTurn);
+      }
     }
   }
 
@@ -161,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _isEmpty(int row, int column) => _board[row][column] == null;
 
-  bool _isValidTop(int row, int column) {
+  bool _validateTop(int row, int column) {
     if (row - 2 < 0) {
       return false;
     }
@@ -175,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return false;
     }
 
-    for (int i = row - 2; i > 0; i--) {
+    for (int i = row - 2; i >= 0; i--) {
       Container child = _board[i][column];
 
       if (child == null) {
@@ -184,8 +205,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if ((child.decoration as BoxDecoration).color ==
           (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-        _changeTopColor(row, column);
-
         return true;
       }
     }
@@ -193,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
-  bool _isValidBottom(int row, int column) {
+  bool _validateBottom(int row, int column) {
     if (row + 2 > 7) {
       return false;
     }
@@ -216,8 +235,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if ((child.decoration as BoxDecoration).color ==
           (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-        _changeButtomColor(row, column);
-
         return true;
       }
     }
@@ -225,7 +242,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
-  bool _isValidLeft(int row, int column) {
+  bool _validateLeft(int row, int column) {
     if (column - 2 < 0) {
       return false;
     }
@@ -239,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return false;
     }
 
-    for (int i = column - 2; i > 0; i--) {
+    for (int i = column - 2; i >= 0; i--) {
       Container child = _board[row][i];
 
       if (child == null) {
@@ -248,8 +265,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if ((child.decoration as BoxDecoration).color ==
           (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-        _changeLeftColor(row, column);
-
         return true;
       }
     }
@@ -257,7 +272,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
-  bool _isValidRight(int row, int column) {
+  bool _validateRight(int row, int column) {
     if (column + 2 > 7) {
       return false;
     }
@@ -280,8 +295,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if ((child.decoration as BoxDecoration).color ==
           (_isFirstPersonTurn ? Colors.black : Colors.white)) {
-        _changeRightColor(row, column);
-
         return true;
       }
     }
@@ -290,6 +303,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _changeTopColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
     while ((_board[--row][column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
       _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
@@ -297,6 +312,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _changeButtomColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
     while ((_board[++row][column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
       _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
@@ -304,6 +321,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _changeLeftColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
     while ((_board[row][--column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
       _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
@@ -311,6 +330,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _changeRightColor(int row, int column) {
+    _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
+
     while ((_board[row][++column].decoration as BoxDecoration).color !=
         (_isFirstPersonTurn ? Colors.black : Colors.white)) {
       _board[row][column] = _buildBlockUnit(_isFirstPersonTurn);
