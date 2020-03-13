@@ -6,11 +6,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Reversi',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.blueGrey,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Reversi'),
     );
   }
 }
@@ -43,88 +43,21 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    _buildBlockUnit(
-                      true,
-                      size: 16.0,
-                    ),
-                    SizedBox(width: 8.0),
-                    Text(
-                      '${_getScore(true)}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12.0,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.0),
-                Row(
-                  children: <Widget>[
-                    _buildBlockUnit(
-                      false,
-                      size: 16.0,
-                    ),
-                    SizedBox(width: 8.0),
-                    Text(
-                      '${_getScore(false)}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Column(
-              children: <Widget>[
-                Text(
-                  'CURRENT PLAYER',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12.0,
-                  ),
-                ),
-                SizedBox(height: 4.0),
-                _buildBlockUnit(
-                  _isFirstPersonTurn,
-                  size: 16.0,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Padding(
-          padding: const EdgeInsets.all(64.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ..._generatePlayground(),
-              SizedBox(height: 64.0),
-              OutlineButton(
-                child: Text('RESTART GAME'),
-                onPressed: _resetBoard,
-              )
+      appBar: _buildAppBar(),
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Spacer(),
+          ..._generatePlayground(),
+          Spacer(),
+          Row(
+            children: <Widget>[
+              _buildScore(true),
+              _buildScore(false),
             ],
-          ),
-        ),
+          )
+        ],
       ),
     );
   }
@@ -176,6 +109,84 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return result;
+  }
+
+  Widget _buildScore(bool isFirstPersonTurn) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 18.0,
+          horizontal: 32.0,
+        ),
+        color: isFirstPersonTurn ? Colors.grey.shade400 : Colors.blueGrey,
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _buildBlockUnit(
+              isFirstPersonTurn,
+              size: 16.0,
+            ),
+            Text(
+              ' x ${_getScore(isFirstPersonTurn)}',
+              style: TextStyle(
+                color: isFirstPersonTurn ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return AppBar(
+      elevation: 0.0,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          RaisedButton(
+            elevation: 0.0,
+            color: Colors.green,
+            child: Text(
+              'RESTART GAME',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14.0,
+              ),
+            ),
+            onPressed: _resetBoard,
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 16.0),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade400,
+              borderRadius: BorderRadius.circular(2.0),
+            ),
+            child: Row(
+              children: <Widget>[
+                Text(
+                  'TURN',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
+                  ),
+                ),
+                SizedBox(width: 8.0),
+                _buildBlockUnit(
+                  _isFirstPersonTurn,
+                  size: 16.0,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _calculateMoves(int row, int column) {
@@ -234,7 +245,10 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() => _isFirstPersonTurn = !_isFirstPersonTurn);
 
         if (!_isFirstPersonTurn) {
-          _selectBestCuttentChoise();
+          Future.delayed(
+            Duration(milliseconds: 500),
+            () => _selectBestCuttentChoise(),
+          );
         }
       }
     }
@@ -246,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50.0),
+        borderRadius: BorderRadius.circular(16.0),
         color: isFirstPersonTurn ? Colors.black : Colors.white,
       ),
     );
