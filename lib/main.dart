@@ -1,14 +1,14 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(App());
 
 const int BOARD_SIZE = 8;
 
 const Color PLAYER_COLOR = Colors.black;
 const Color AI_COLOR = Colors.white;
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,24 +18,24 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.green,
         primarySwatch: Colors.blueGrey,
       ),
-      home: MyHomePage(title: 'Reversi'),
+      home: HomePage(title: 'Reversi'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class HomePage extends StatefulWidget {
   final String title;
 
-  MyHomePage({
+  HomePage({
     Key key,
     this.title,
   }) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   double _blocSize;
   bool _isPlayerTurn = true;
 
@@ -664,41 +664,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int row = 0; row < BOARD_SIZE; row++) {
       for (int column = 0; column < BOARD_SIZE; column++) {
         if (_isEmpty(row, column)) {
-          int score = 0;
-
-          if (_validateTop(row, column)) {
-            score = _changeTopColor(row, column, true);
-          }
-
-          if (_validateBottom(row, column)) {
-            score = _changeButtomColor(row, column, true);
-          }
-
-          if (_validateLeft(row, column)) {
-            score = _changeLeftColor(row, column, true);
-          }
-
-          if (_validateRight(row, column)) {
-            score = _changeRightColor(row, column, true);
-          }
-
-          if (_validateTopLeft(row, column)) {
-            score = _changeTopLeftColor(row, column, true);
-          }
-
-          if (_validateTopRight(row, column)) {
-            score = _changeTopRightColor(row, column, true);
-          }
-
-          if (_validateBottomLeft(row, column)) {
-            score = _changeBottomLeftColor(row, column, true);
-          }
-
-          if (_validateBottomRight(row, column)) {
-            score = _changeBottomRightColor(row, column, true);
-          }
-
-          scores[row][column] = score;
+          scores[row][column] = _getPositionScore(row, column, true);
         }
       }
     }
@@ -706,14 +672,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return scores;
   }
 
-  List<Position> _getAvailablePositions() {
+  List<PositionInformation> _getAvailablePositions() {
     List<List<int>> scores = _getPositionsInformation();
-    List<Position> availablePositions = [];
+    List<PositionInformation> availablePositions = [];
 
     for (int row = 0; row < BOARD_SIZE; row++) {
       for (int column = 0; column < BOARD_SIZE; column++) {
         if (scores[row][column] > 0) {
-          availablePositions.add(Position(row, column, scores[row][column]));
+          availablePositions
+              .add(PositionInformation(row, column, scores[row][column]));
         }
       }
     }
@@ -722,15 +689,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _selectGoodPosition() {
-    List<Position> positions = _getAvailablePositions();
+    List<PositionInformation> positions = _getAvailablePositions();
 
     if (positions.isEmpty) {
       _calculateChanges(hasNoAvailablePosition: true);
     } else {
-      Position selectedPosition;
+      PositionInformation selectedPosition;
 
       positions.sort(
-        (Position first, Position second) => second.score.compareTo(first.score),
+        (PositionInformation first, PositionInformation second) =>
+            second.score.compareTo(first.score),
       );
 
       selectedPosition =
@@ -752,55 +720,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     } else {
       if (_isEmpty(row, column)) {
-        bool updateState = false;
-
-        if (_validateTop(row, column)) {
-          _changeTopColor(row, column, false);
-
-          updateState = true;
-        }
-
-        if (_validateBottom(row, column)) {
-          _changeButtomColor(row, column, false);
-
-          updateState = true;
-        }
-
-        if (_validateLeft(row, column)) {
-          _changeLeftColor(row, column, false);
-
-          updateState = true;
-        }
-
-        if (_validateRight(row, column)) {
-          _changeRightColor(row, column, false);
-
-          updateState = true;
-        }
-
-        if (_validateTopLeft(row, column)) {
-          _changeTopLeftColor(row, column, false);
-
-          updateState = true;
-        }
-
-        if (_validateTopRight(row, column)) {
-          _changeTopRightColor(row, column, false);
-
-          updateState = true;
-        }
-
-        if (_validateBottomLeft(row, column)) {
-          _changeBottomLeftColor(row, column, false);
-
-          updateState = true;
-        }
-
-        if (_validateBottomRight(row, column)) {
-          _changeBottomRightColor(row, column, false);
-
-          updateState = true;
-        }
+        bool updateState = _getPositionScore(row, column, false) > 0;
 
         if (updateState) {
           setState(() => _isPlayerTurn = !_isPlayerTurn);
@@ -815,12 +735,50 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
+
+  int _getPositionScore(int row, int column, getCountOnly) {
+    int score = 0;
+
+    if (_validateTop(row, column)) {
+      score = _changeTopColor(row, column, getCountOnly);
+    }
+
+    if (_validateBottom(row, column)) {
+      score = _changeButtomColor(row, column, getCountOnly);
+    }
+
+    if (_validateLeft(row, column)) {
+      score = _changeLeftColor(row, column, getCountOnly);
+    }
+
+    if (_validateRight(row, column)) {
+      score = _changeRightColor(row, column, getCountOnly);
+    }
+
+    if (_validateTopLeft(row, column)) {
+      score = _changeTopLeftColor(row, column, getCountOnly);
+    }
+
+    if (_validateTopRight(row, column)) {
+      score = _changeTopRightColor(row, column, getCountOnly);
+    }
+
+    if (_validateBottomLeft(row, column)) {
+      score = _changeBottomLeftColor(row, column, getCountOnly);
+    }
+
+    if (_validateBottomRight(row, column)) {
+      score = _changeBottomRightColor(row, column, getCountOnly);
+    }
+
+    return score;
+  }
 }
 
-class Position {
+class PositionInformation {
   final int row;
   final int column;
   final int score;
 
-  Position(this.row, this.column, this.score);
+  PositionInformation(this.row, this.column, this.score);
 }
