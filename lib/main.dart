@@ -50,7 +50,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _blocSize = (MediaQuery.of(context).size.width - BOARD_SIZE * 5) / BOARD_SIZE;
+    _blocSize =
+        (MediaQuery.of(context).size.width - BOARD_SIZE * 5) / BOARD_SIZE;
 
     return Scaffold(
       appBar: _buildAppBar(),
@@ -170,7 +171,8 @@ class _HomePageState extends State<HomePage> {
             onPressed: _resetBoard,
           ),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 9.0, horizontal: 16.0),
             decoration: BoxDecoration(
               color: Colors.grey.shade400,
               borderRadius: BorderRadius.circular(2.0),
@@ -635,15 +637,16 @@ class _HomePageState extends State<HomePage> {
       BOARD_SIZE,
       (int row) => List.generate(
         BOARD_SIZE,
-        (int column) => row == BOARD_SIZE / 2 - 1 && column == BOARD_SIZE / 2 - 1
-            ? _buildBlockUnit(false)
-            : row == BOARD_SIZE / 2 - 1 && column == BOARD_SIZE / 2
-                ? _buildBlockUnit(true)
-                : row == BOARD_SIZE / 2 && column == BOARD_SIZE / 2 - 1
+        (int column) =>
+            row == BOARD_SIZE / 2 - 1 && column == BOARD_SIZE / 2 - 1
+                ? _buildBlockUnit(false)
+                : row == BOARD_SIZE / 2 - 1 && column == BOARD_SIZE / 2
                     ? _buildBlockUnit(true)
-                    : row == BOARD_SIZE / 2 && column == BOARD_SIZE / 2
-                        ? _buildBlockUnit(false)
-                        : null,
+                    : row == BOARD_SIZE / 2 && column == BOARD_SIZE / 2 - 1
+                        ? _buildBlockUnit(true)
+                        : row == BOARD_SIZE / 2 && column == BOARD_SIZE / 2
+                            ? _buildBlockUnit(false)
+                            : null,
       ),
     );
 
@@ -694,27 +697,48 @@ class _HomePageState extends State<HomePage> {
     if (positions.isEmpty) {
       _calculateChanges(hasNoAvailablePosition: true);
     } else {
+      List<PositionInformation> corners = [];
       PositionInformation selectedPosition;
 
-      positions.sort(
-        (PositionInformation first, PositionInformation second) =>
-            second.score.compareTo(first.score),
+      for (PositionInformation position in positions) {
+        if (position.row == 0 && position.column == 0) {
+          corners.add(position);
+        } else if (position.row == 0 && position.column == BOARD_SIZE - 1) {
+          corners.add(position);
+        } else if (position.row == BOARD_SIZE - 1 && position.column == 0) {
+          corners.add(position);
+        } else if (position.row == BOARD_SIZE - 1 &&
+            position.column == BOARD_SIZE - 1) {
+          corners.add(position);
+        }
+      }
+
+      if (corners.isNotEmpty) {
+        selectedPosition = positions[math.Random().nextInt(corners.length)];
+      } else if (positions.isNotEmpty) {
+        positions.sort(
+          (PositionInformation first, PositionInformation second) =>
+              second.score.compareTo(first.score),
+        );
+
+        selectedPosition =
+            positions[math.Random().nextInt(math.min(positions.length, 3))];
+      }
+
+      _calculateChanges(
+        row: selectedPosition.row,
+        column: selectedPosition.column,
       );
-
-      selectedPosition =
-          positions[math.Random().nextInt(math.min(positions.length, 3))];
-
-      _calculateChanges(row: selectedPosition.row, column: selectedPosition.column);
     }
   }
 
-  void _calculateChanges({
+  Future<void> _calculateChanges({
     int row,
     int column,
     bool hasNoAvailablePosition = false,
-  }) {
+  }) async {
     if (hasNoAvailablePosition || _getAvailablePositions().isEmpty) {
-      Future.delayed(
+      await Future.delayed(
         Duration(milliseconds: 500),
         () => setState(() => _isPlayerTurn = !_isPlayerTurn),
       );
@@ -726,7 +750,7 @@ class _HomePageState extends State<HomePage> {
           setState(() => _isPlayerTurn = !_isPlayerTurn);
 
           if (!_isPlayerTurn) {
-            Future.delayed(
+            await Future.delayed(
               Duration(milliseconds: 500),
               () => _selectGoodPosition(),
             );
@@ -734,6 +758,12 @@ class _HomePageState extends State<HomePage> {
         }
       }
     }
+
+    await Future.delayed(Duration(milliseconds: 500), () {
+      if (_getScore(true) + _getScore(false) == BOARD_SIZE * BOARD_SIZE) {
+        _showFinishedGameDialog();
+      }
+    });
   }
 
   int _getPositionScore(int row, int column, getCountOnly) {
@@ -772,6 +802,29 @@ class _HomePageState extends State<HomePage> {
     }
 
     return score;
+  }
+
+  Future<void> _showFinishedGameDialog() {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      child: AlertDialog(
+        content: Text(
+          _getScore(true) > _getScore(false) ? 'YOU WIN!' : 'AI WINS!',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('RESTART GAME'),
+            onPressed: () {
+              _resetBoard();
+
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
 
