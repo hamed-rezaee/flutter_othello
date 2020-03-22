@@ -713,9 +713,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
 
-      if (corners.isNotEmpty) {
-        selectedPosition = positions[math.Random().nextInt(corners.length)];
-      } else if (positions.isNotEmpty) {
+      if (corners.isEmpty) {
         positions.sort(
           (PositionInformation first, PositionInformation second) =>
               second.score.compareTo(first.score),
@@ -723,6 +721,8 @@ class _HomePageState extends State<HomePage> {
 
         selectedPosition =
             positions[math.Random().nextInt(math.min(positions.length, 3))];
+      } else {
+        selectedPosition = positions[math.Random().nextInt(corners.length)];
       }
 
       _calculateChanges(
